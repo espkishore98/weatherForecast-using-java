@@ -6,11 +6,16 @@ import java.util.Scanner;
 
 import javax.management.RuntimeErrorException;
 
+import com.weatherforecast.domain.ResponseObject;
+import com.weatherforecast.domain.WeatherResponse;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
 
 @Service
 public class WeatherForecastService implements IWeatherForecastService{
@@ -18,7 +23,7 @@ public class WeatherForecastService implements IWeatherForecastService{
 	String apiKey;
 	
 	@Override
-	public String weatherforecast(String cityName) {
+	public ResponseObject weatherforecast(String cityName) {
 		try {
 		String baseUrl="https://api.openweathermap.org/data/2.5/weather?";
 		URL url=new URL(baseUrl+"q="+cityName+"&appid="+apiKey);
@@ -57,19 +62,25 @@ public class WeatherForecastService implements IWeatherForecastService{
 			double tempInCelsius= ((double)temperature-273.15);
 			float temp=(float) tempInCelsius;
 			
-			return "Temperature in "+cityName+" in celsius is " +temp+"\n"+"atmospheric Pressure (in hPa unit):"+pressure+"\n"+"Humidity:"+humidity+"\n"+"Weather Description:"+description;
-			
+				WeatherResponse weatherForecastResponse= new WeatherResponse();
+			weatherForecastResponse.setTemperature(temp);
+			weatherForecastResponse.setHumidity(humidity.toString());
+			weatherForecastResponse.setAtmosphericPressure(pressure.toString());
+			weatherForecastResponse.setWeatherDescription(description.toString());
+
+				return new ResponseObject(weatherForecastResponse,null,HttpStatus.OK);
 	
 			}catch (Exception e) {
-				return e.getMessage();
+				return new ResponseObject(null,e.getMessage(),HttpStatus.BAD_REQUEST);
+				
 			}
 			
 		}
 			
 		}catch (Exception e) {
-			return e.getMessage();// TODO: handle exception
+			return new ResponseObject(null,e.getMessage(),HttpStatus.BAD_REQUEST);
 		}
-		
+
 	}
 
 }

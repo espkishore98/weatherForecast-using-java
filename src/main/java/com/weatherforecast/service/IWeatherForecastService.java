@@ -1,7 +1,9 @@
 package com.weatherforecast.service;
 
+import com.weatherforecast.domain.ResponseObject;
+
 public interface IWeatherForecastService {
 
-	String weatherforecast(String cityName);
+	ResponseObject weatherforecast(String cityName);
 
 }
